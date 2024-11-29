@@ -1,0 +1,48 @@
+# prompt: consider only 5 images and give me same output
+
+# Example Usage with Kalman Filtering and separate image outputs
+path = '/content/DATASET'
+image_files = [f for f in os.listdir(path) if f.endswith(('png',))]
+
+lower_white = np.array([0, 0, 200])
+upper_white = np.array([180, 30, 255])
+
+for i in range(5): # Process only the first 5 images
+    if i < len(image_files):
+        filename = image_files[i]
+        image_path = os.path.join(path, filename)
+        tracked_image = track_object(image_path, kalman, lower_white, upper_white)
+
+        if tracked_image is not None:
+            # Display the image with bounding boxes and Kalman prediction
+            cv2_imshow(tracked_image)
+            print(f"Image {i+1}: {filename}") # Numbered output
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+# prompt: apply contour detection algorithm to the above 5 images
+
+# Example Usage with Kalman Filtering and separate image outputs
+path = '/content/DATASET'
+image_files = [f for f in os.listdir(path) if f.endswith(('png', 'jpg', 'jpeg'))] # Include other image types
+
+lower_white = np.array([0, 0, 200])
+upper_white = np.array([180, 30, 255])
+
+for i in range(5): # Process only the first 5 images
+    if i < len(image_files):
+        filename = image_files[i]
+        image_path = os.path.join(path, filename)
+
+        #Find Contours
+        img = cv2.imread(image_path)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(gray, 127, 255, 0)
+        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        img_contours = cv2.drawContours(img, contours, -1, (0,255,0), 3)
+
+        # Display the image with contours
+        cv2_imshow(img_contours)
+        print(f"Image {i+1}: {filename} - Contours") # Numbered output
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
